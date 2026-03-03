@@ -101,6 +101,23 @@ async def chat(request: ChatRequest):
         if response.reply and response.reply.summary and response.reply.summary.summary_text:
             reply_text = response.reply.summary.summary_text
 
+        # Append search results to provide context, especially when summary fails
+        if response.search_results:
+            reply_text += "\n\n**Relevant sources:**\n"
+            for result in response.search_results:
+                doc = result.document
+                title = doc.id
+                url = ""
+                if doc.derived_struct_data:
+                    title = doc.derived_struct_data.get("title", title)
+                    url = doc.derived_struct_data.get("link", "")
+                
+                if url:
+                    # The frontend uses innerHTML, so we can pass HTML links
+                    reply_text += f"- <a href='{url}' target='_blank'>{title}</a>\n"
+                else:
+                    reply_text += f"- {title}\n"
+
         return JSONResponse({
             "reply": reply_text,
             "conversation_id": conv_id
