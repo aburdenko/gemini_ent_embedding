@@ -2,6 +2,7 @@ import os
 import uuid
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 import uvicorn
 from pydantic import BaseModel
@@ -13,6 +14,23 @@ from google.oauth2 import service_account
 load_dotenv(override=True)
 
 app = FastAPI(title="Gemini Enterprise Custom Embed")
+
+# Allow iframe embedding and cross-origin requests
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+@app.middleware("http")
+async def add_security_headers(request: Request, call_next):
+    response = await call_next(request)
+    # Ensure X-Frame-Options allows embedding
+    if "X-Frame-Options" in response.headers:
+        del response.headers["X-Frame-Options"]
+    return response
 
 # Setup credentials
 credentials_path = os.getenv("SERVICE_ACCOUNT_KEY_FILE")

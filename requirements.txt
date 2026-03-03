@@ -14,3 +14,9 @@ fsspec
 tabulate
 PyYAML
 opentelemetry-exporter-gcp-trace
+fastapi
+uvicorn
+pydantic
+python-dotenv
+google-cloud-discoveryengine
+
