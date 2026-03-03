@@ -1,7 +1,7 @@
 import os
 import uuid
 from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 import uvicorn
@@ -205,6 +205,10 @@ async def get_embedded_page():
     </html>
     """
     return HTMLResponse(content=html_content)
+
+@app.get("/front-end.html", response_class=FileResponse)
+async def get_frontend_page():
+    return FileResponse("front-end.html")
 
 if __name__ == "__main__":
     uvicorn.run("app:app", host="0.0.0.0", port=8000, reload=True)
